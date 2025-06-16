@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:7878}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/nota-music}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
