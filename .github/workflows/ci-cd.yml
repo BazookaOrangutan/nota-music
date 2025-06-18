@@ -67,7 +67,7 @@ jobs:
       - name: Prepare frontend artifacts
         run: |
           mkdir -p artifacts/frontend
-          cp -r frontend/dist artifacts/frontend/
+          cp -r frontend/dist/* artifacts/frontend/
           сp frontend/Dockerfile artifacts/frontend/
 
       - name: Upload frontend artifacts
