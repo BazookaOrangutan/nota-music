@@ -24,23 +24,23 @@ jobs:
           cd backend
           mvn clean package
 
-      - name: Prepare backend artifacts
-        run: |
-          mkdir -p artifacts/backend
-          cp backend/target/*.jar artifacts/backend/
-          cp backend/Dockerfile artifacts/backend/
+      - name: Copy backend Dockerfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dockerfile
+          path: backend/Dockerfile
 
       - name: Copy docker-compose
         uses: actions/upload-artifact@v4
         with:
           name: docker-compose
-          path: artifacts/docker-compose.yml
+          path: docker-compose.yml
 
-      - name: Upload backend artifacts
+      - name: Copy backend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-artifacts
-          path: artifacts/backend
+          name: backend-jar
+          path: backend/target/*.jar
 
   build-frontend:
     name: Build React Frontend
@@ -64,34 +64,46 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Prepare frontend artifacts
-        run: |
-          mkdir -p artifacts/frontend
-          cp -r frontend/dist artifacts/frontend/
-          cp frontend/Dockerfile artifacts/frontend/
-
-      - name: Upload frontend artifacts
+      - name: Copy frontend Dockerfile
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-artifacts
-          path: artifacts/frontend
+          name: frontend-dockerfile
+          path: frontend/Dockerfile
+
+      - name: Copy frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
 
   deploy:
     name: Deploy to Server via SSH
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-22.04
     steps:
-      - name: Download backend artifacts
+      - name: Download backend build
         uses: actions/download-artifact@v4
         with:
-          name: backend-artifacts
-          path: artifacts/backend
+          name: backend-jar
+          path: artifacts/backend/
 
-      - name: Download frontend artifacts
+      - name: Download frontend build
         uses: actions/download-artifact@v4
         with:
-          name: frontend-artifacts
-          path: artifacts/frontend
+          name: frontend-build
+          path: artifacts/frontend/
+
+      - name: Download backend Dockerfile
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dockerfile
+          path: artifacts/backend/
+
+      - name: Download frontend Dockerfile
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dockerfile
+          path: artifacts/frontend/
 
       - name: Download docker-compose
         uses: actions/download-artifact@v4
@@ -99,7 +111,17 @@ jobs:
           name: docker-compose
           path: artifacts/
 
-      - name: Copy files to server
+      - name: Upload artifacts to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "artifacts/*"
+          target: "~/nota-music"
+
+      - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -113,12 +135,11 @@ jobs:
           script: |
             mkdir -p ~/nota-music/backend ~/nota-music/frontend ~/nota-music
             
-            cp ./artifacts/backend/*.jar ~/nota-music/backend/app.jar
-            cp ./artifacts/backend/Dockerfile ~/nota-music/backend/
-            
-            cp -r ./artifacts/frontend/* ~/nota-music/frontend/
-            
-            cp ./artifacts/docker-compose.yml ~/nota-music/
+            mv backend/*.jar backend/app.jar
+            mv backend/Dockerfile backend/
+            mv frontend/Dockerfile frontend/
+            mv frontend/* frontend/
+            mv docker-compose.yml ./
             
             cat <<EOF > ~/nota-music/.env
             POSTGRES_USER=${POSTGRES_USER}
