@@ -2,9 +2,9 @@ spring:
   application:
     name: backend
   datasource:
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:7878}
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/nota-music}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:7878}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nota-music}
   jpa:
     hibernate:
       ddl-auto: create-drop
