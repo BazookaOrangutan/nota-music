@@ -85,31 +85,31 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
-          path: artifacts/backend/
+          path: backend/
 
       - name: Download frontend build
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: artifacts/frontend/
+          path: frontend/dist
 
       - name: Download backend Dockerfile
         uses: actions/download-artifact@v4
         with:
           name: backend-dockerfile
-          path: artifacts/backend/
+          path: backend/
 
       - name: Download frontend Dockerfile
         uses: actions/download-artifact@v4
         with:
           name: frontend-dockerfile
-          path: artifacts/frontend/
+          path: frontend/
 
       - name: Download docker-compose
         uses: actions/download-artifact@v4
         with:
           name: docker-compose
-          path: artifacts/
+          path: ./
 
       - name: Upload artifacts to server
         uses: appleboy/scp-action@master
@@ -118,7 +118,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "artifacts/*"
+          source: "./*"
           target: "~/nota-music"
 
       - name: Deploy to Server via SSH
@@ -132,15 +132,8 @@ jobs:
             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           port: 22
-          script: |
-            mkdir -p ~/nota-music/backend ~/nota-music/frontend ~/nota-music
-            
-            mv backend/*.jar backend/app.jar
-            mv backend/Dockerfile backend/
-            mv frontend/Dockerfile frontend/
-            mv frontend/* frontend/
-            mv docker-compose.yml ./
-            
+          script: |       
+                       
             cat <<EOF > ~/nota-music/.env
             POSTGRES_USER=${POSTGRES_USER}
             POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
