@@ -24,6 +24,18 @@ jobs:
           cd backend
           mvn clean package
 
+      - name: Copy backend Dockerfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dockerfile
+          path: backend/Dockerfile
+
+      - name: Copy docker-compose
+        uses: actions/upload-artifact@v4
+        with:
+            name: docker-compose
+            path: docker-compose.yml
+
       - name: Copy backend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -52,6 +64,12 @@ jobs:
           cd frontend
           npm run build
 
+      - name: Copy frontend Dockerfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dockerfile
+          path: frontend/Dockerfile
+
       - name: Copy frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -63,17 +81,35 @@ jobs:
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-22.04
     steps:
-      - name: Download artifacts
+      - name: Download backend build
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
           path: backend/
 
-      - name: Download frontend artifact
+      - name: Download frontend build
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: frontend/
+
+      - name: Download backend Dockerfile
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dockerfile
+          path: backend/
+
+      - name: Download frontend Dockerfile
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dockerfile
+          path: frontend/
+
+      - name: Download docker-compose
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-compose
+          path: ./
 
       - name: Copy files to server
         uses: appleboy/ssh-action@master
