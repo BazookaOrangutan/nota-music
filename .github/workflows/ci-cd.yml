@@ -122,13 +122,13 @@ jobs:
           script: |
             mkdir -p ~/nota-music/backend ~/nota-music/frontend ~/nota-music
             
-            cp backend/*.jar ~/nota-music/backend/app.jar
+            cp $GITHUB_WORKSPACE/backend/*.jar ~/nota-music/backend/app.jar
             
-            cp -r frontend/* ~/nota-music/frontend/
+            cp -r $GITHUB_WORKSPACE/frontend/* ~/nota-music/frontend/
             
-            cp backend/Dockerfile ~/nota-music/backend/
-            cp frontend/Dockerfile ~/nota-music/frontend/
-            cp docker-compose.yml ~/nota-music/
+            cp $GITHUB_WORKSPACE/backend/Dockerfile ~/nota-music/backend/
+            cp $GITHUB_WORKSPACE/frontend/Dockerfile ~/nota-music/frontend/
+            cp $GITHUB_WORKSPACE/docker-compose.yml ~/nota-music/
             
             cat <<EOF > ~/nota-music/.env
             POSTGRES_USER=${POSTGRES_USER}
