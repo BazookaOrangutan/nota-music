@@ -85,7 +85,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
-          path: backend/
+          path: backend/target/
 
       - name: Download frontend build
         uses: actions/download-artifact@v4
