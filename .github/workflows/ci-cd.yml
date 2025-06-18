@@ -56,12 +56,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
-          path: frontend/build
+          path: frontend/dist
 
   deploy:
     name: Deploy to Server via SSH
     needs: [build-backend, build-frontend]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -81,30 +81,30 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          envs:
+          envs: |
             POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           port: 22
           script: |
-            mkdir -p ~/music-app/backend ~/music-app/frontend ~/music-app
+            mkdir -p ~/nota-music/backend ~/nota-music/frontend ~/nota-music
 
-            cp ./backend/*.jar ~/music-app/backend/app.jar
+            cp ./backend/*.jar ~/nota-music/backend/app.jar
 
-            cp -r ./frontend/* ~/music-app/frontend/
+            cp -r ./frontend/* ~/nota-music/frontend/
 
-            cp ./backend/Dockerfile ~/music-app/backend/
-            cp ./frontend/Dockerfile ~/music-app/frontend/
-            cp ./docker-compose.yml ~/music-app/
+            cp ./backend/Dockerfile ~/nota-music/backend/
+            cp ./frontend/Dockerfile ~/nota-music/frontend/
+            cp ./docker-compose.yml ~/nota-music/
 
-            cat <<EOF > ~/music-app/.env
+            cat <<EOF > ~/nota-music/.env
             POSTGRES_USER=${POSTGRES_USER}
             POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
             POSTGRES_DB=${POSTGRES_DB}
             EOF
 
-            cd ~/music-app
+            cd ~/nota-music
             docker-compose down || true
             docker-compose --env-file .env up -d --build
 
-            rm -rf ~/music-app/backend/*.jar ~/music-app/frontend/*
+            rm -rf ~/nota-music/backend/*.jar ~/nota-music/frontend/*
