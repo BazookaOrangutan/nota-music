@@ -131,6 +131,7 @@ jobs:
             POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+            POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           port: 22
           script: |
             cd ~/nota-music
@@ -139,6 +140,7 @@ jobs:
             POSTGRES_USER=${POSTGRES_USER}
             POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
             POSTGRES_DB=${POSTGRES_DB}
+            POSTGRES_URL=${jdbc:postgresql://postgres:5432/nota-music}
             EOF
             
             docker-compose down || true
