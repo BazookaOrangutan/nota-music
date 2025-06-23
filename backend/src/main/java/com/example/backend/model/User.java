@@ -18,6 +18,10 @@ public class User {
 
     private String username;
 
+    @OneToOne
+    @JoinColumn(name = "auth_user_id", nullable = false)
+    private AuthUser authUser;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_favourite_track",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
