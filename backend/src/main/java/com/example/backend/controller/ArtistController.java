@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.model.Artist;
 import com.example.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class ArtistController {
     @GetMapping("/{id}")
     public Artist getArtistById(@PathVariable UUID id) {
         return artistService.getArtist(id);
+    }
+
+    @GetMapping("/{id}/albums")
+    public List<AlbumResponse> getAlbumsByArtist(@PathVariable UUID id) {
+        return artistService.getAlbumsByArtistId(id);
     }
 
     @PostMapping

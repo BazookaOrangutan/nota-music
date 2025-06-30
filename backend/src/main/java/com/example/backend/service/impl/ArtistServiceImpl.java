@@ -1,7 +1,8 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.exception.ArtistNotFoundException;
-import com.example.backend.exception.TrackNotFoundException;
+import com.example.backend.mapper.AlbumMapper;
 import com.example.backend.model.Artist;
 import com.example.backend.repository.ArtistRepository;
 import com.example.backend.service.ArtistService;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistRepository artistRepository;
+    private final AlbumMapper albumMapper;
 
     @Override
     public Artist createArtist(Artist artist) {
@@ -30,6 +32,14 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
+    public List<AlbumResponse> getAlbumsByArtistId(UUID id) {
+
+        Artist artist = getArtist(id);
+
+        return artist.getAlbums().stream().map(albumMapper::toResponse).toList();
+    }
+
+    @Override
     public List<Artist> getArtists() {
         return artistRepository.findAll();
     }
@@ -37,7 +47,7 @@ public class ArtistServiceImpl implements ArtistService {
     @Override
     public Artist updateArtist(UUID id, Artist artist) {
 
-        if(!artistRepository.existsById(id)) {
+        if (!artistRepository.existsById(id)) {
             throw new ArtistNotFoundException(id);
         }
 

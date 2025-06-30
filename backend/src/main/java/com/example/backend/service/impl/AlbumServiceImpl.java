@@ -1,18 +1,21 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.request.AlbumRequest;
-import com.example.backend.dto.request.TrackRequest;
 import com.example.backend.exception.AlbumNotFoundException;
 import com.example.backend.mapper.AlbumMapper;
-import com.example.backend.mapper.TrackMapper;
 import com.example.backend.model.Album;
+import com.example.backend.model.Artist;
 import com.example.backend.model.Track;
 import com.example.backend.repository.AlbumRepository;
 import com.example.backend.service.AlbumService;
+import com.example.backend.service.ArtistService;
 import com.example.backend.service.TrackService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,24 +24,27 @@ import java.util.UUID;
 public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumRepository albumRepository;
-    private final TrackService trackService;
     private final AlbumMapper albumMapper;
-    private final TrackMapper trackMapper;
+
+    private final ArtistService artistService;
+
+    private final TrackService trackService;
+
 
     @Override
-    public Album createAlbum(AlbumRequest request) {
+    @Transactional
+    public Album createAlbumWithTracks(AlbumRequest request, MultipartFile[] files) throws IOException {
 
-        List<Track> tracks = request.getTracks().stream().map(trackMapper::toTrack).toList();
         Album album = albumMapper.fromRequest(request);
-        albumRepository.save(album);
 
+        Artist artist = artistService.getArtist(request.getArtistId());
+        album.getArtists().add(artist);
 
-        tracks.forEach(el -> {
-            el.setAlbum(album);
-            trackService.createTrack(el);
-        });
+        List<Track> tracks = trackService.saveTracks(request.getTracks(), files, album);
 
-        return album;
+        album.setTracks(tracks);
+
+        return albumRepository.save(album);
     }
 
     @Override

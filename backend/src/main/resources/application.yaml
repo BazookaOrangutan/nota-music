@@ -7,4 +7,11 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nota-music}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+  servlet:
+    multipart:
+      max-request-size: 200MB
+      max-file-size: 40MB
+token:
+  signing:
+    key: ${JWT_KEY:53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855}

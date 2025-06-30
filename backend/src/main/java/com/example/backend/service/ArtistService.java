@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.model.Artist;
 
 import java.util.List;
@@ -10,6 +11,8 @@ public interface ArtistService {
     Artist createArtist(Artist artist);
 
     Artist getArtist(UUID id);
+
+    List<AlbumResponse> getAlbumsByArtistId(UUID id);
 
     List<Artist> getArtists();
 

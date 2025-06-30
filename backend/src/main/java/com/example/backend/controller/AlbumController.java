@@ -4,8 +4,11 @@ import com.example.backend.dto.request.AlbumRequest;
 import com.example.backend.model.Album;
 import com.example.backend.service.AlbumService;
 import lombok.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +31,11 @@ public class AlbumController {
         return albumService.getAlbumById(id);
     }
 
-    @PostMapping
-    public Album createAlbum(@RequestBody AlbumRequest albumRequest) {
-        return albumService.createAlbum(albumRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Album createAlbum(
+            @RequestPart("album") AlbumRequest albumRequest,
+            @RequestParam("files") MultipartFile[] files) throws IOException {
+        return albumService.createAlbumWithTracks(albumRequest, files);
     }
 
     @PutMapping("/{id}")

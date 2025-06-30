@@ -1,5 +1,6 @@
 package com.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,6 +18,9 @@ public class Track {
 
     private String title;
 
+    private String filePath;
+
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "album_id")
     private Album album;

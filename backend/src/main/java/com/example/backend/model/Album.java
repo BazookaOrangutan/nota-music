@@ -1,9 +1,12 @@
 package com.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +19,12 @@ public class Album {
     private UUID id;
 
     private String title;
+
+    private LocalDate releaseDate;
+
+    @JsonManagedReference // основная сторона
+    @OneToMany(mappedBy = "album")
+    private List<Track> tracks;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "album_artist",

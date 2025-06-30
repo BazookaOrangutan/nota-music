@@ -1,8 +1,12 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.TrackRequest;
 import com.example.backend.dto.response.TrackResponse;
+import com.example.backend.model.Album;
 import com.example.backend.model.Track;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +21,17 @@ public interface TrackService {
      * @param track трек
      * @return созданный трек
      */
-    Track createTrack(Track track);
+    Track saveTrack(Track track);
+
+    /**
+     * Сохранение треков
+     *
+     * @param data  данные треков
+     * @param files файлы треков
+     * @param album
+     * @return список созданных треков
+     */
+    List<Track> saveTracks(List<TrackRequest> data, MultipartFile[] files, Album album) throws IOException;
 
     /**
      * Получение трека по его уникальному идентификатору

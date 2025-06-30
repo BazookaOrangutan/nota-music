@@ -1,16 +1,20 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.dto.request.TrackRequest;
 import com.example.backend.dto.response.TrackResponse;
 import com.example.backend.exception.TrackNotFoundException;
 import com.example.backend.mapper.TrackMapper;
+import com.example.backend.model.Album;
 import com.example.backend.model.Track;
 import com.example.backend.repository.TrackRepository;
+import com.example.backend.service.FileStorageService;
 import com.example.backend.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -18,10 +22,29 @@ public class TrackServiceImpl implements TrackService {
 
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
+    private final FileStorageService fileStorageService;
 
     @Override
-    public Track createTrack(Track track) {
+    public Track saveTrack(Track track) {
         return trackRepository.save(track);
+    }
+
+    @Override
+    public List<Track> saveTracks(List<TrackRequest> data, MultipartFile[] files, Album album) throws IOException {
+
+        List<Track> tracks = new ArrayList<>();
+        for (int i = 0; i < files.length; i++) {
+
+            Track track = trackMapper.toTrack(data.get(i));
+            track.setAlbum(album);
+
+            String filePath = fileStorageService.saveFile(files[i]);
+            track.setFilePath(filePath);
+
+            tracks.add(track);
+        }
+
+        return trackRepository.saveAll(tracks);
     }
 
     @Override

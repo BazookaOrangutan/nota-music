@@ -30,7 +30,7 @@ public class TrackController {
 
     @PostMapping
     public Track createTrack(@RequestBody Track track) {
-        return trackService.createTrack(track);
+        return trackService.saveTrack(track);
     }
 
 
