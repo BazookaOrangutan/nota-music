@@ -9,5 +9,6 @@ import org.mapstruct.Mapper;
 public interface TrackMapper {
 
     TrackResponse toResponse(Track track);
+
     Track toTrack(TrackRequest trackRequest);
 }

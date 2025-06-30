@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.response.AlbumResponse;
+import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.model.Artist;
 import com.example.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class ArtistController {
     private final ArtistService artistService;
 
     @GetMapping
-    public List<Artist> getAllArtists() {
+    public List<ArtistResponse> getAllArtists() {
         return artistService.getArtists();
     }
 

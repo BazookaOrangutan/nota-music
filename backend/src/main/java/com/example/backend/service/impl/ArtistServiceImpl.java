@@ -1,8 +1,10 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.response.AlbumResponse;
+import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.exception.ArtistNotFoundException;
 import com.example.backend.mapper.AlbumMapper;
+import com.example.backend.mapper.ArtistMapper;
 import com.example.backend.model.Artist;
 import com.example.backend.repository.ArtistRepository;
 import com.example.backend.service.ArtistService;
@@ -18,6 +20,8 @@ public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistRepository artistRepository;
     private final AlbumMapper albumMapper;
+
+    private final ArtistMapper artistMapper;
 
     @Override
     public Artist createArtist(Artist artist) {
@@ -40,8 +44,9 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public List<Artist> getArtists() {
-        return artistRepository.findAll();
+    public List<ArtistResponse> getArtists() {
+
+        return artistRepository.findAll().stream().map(artistMapper::toResponse).toList();
     }
 
     @Override

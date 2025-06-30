@@ -12,7 +12,5 @@ public class ArtistResponse {
 
     private String name;
 
-    private List<TrackResponse> tracks;
-
     private List<AlbumResponse> albums;
 }

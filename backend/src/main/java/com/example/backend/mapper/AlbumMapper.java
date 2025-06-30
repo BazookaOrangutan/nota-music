@@ -9,6 +9,6 @@ import org.mapstruct.Mapper;
 public interface AlbumMapper {
 
     AlbumResponse toResponse(Album album);
-    Album fromRequest(AlbumRequest albumRequest);
 
+    Album fromRequest(AlbumRequest albumRequest);
 }
