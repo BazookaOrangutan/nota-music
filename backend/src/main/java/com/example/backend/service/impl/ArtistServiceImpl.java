@@ -8,6 +8,7 @@ import com.example.backend.mapper.ArtistMapper;
 import com.example.backend.model.Artist;
 import com.example.backend.repository.ArtistRepository;
 import com.example.backend.service.ArtistService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +44,9 @@ public class ArtistServiceImpl implements ArtistService {
         return artist.getAlbums().stream().map(albumMapper::toResponse).toList();
     }
 
+    @Transactional
     @Override
     public List<ArtistResponse> getArtists() {
-
         return artistRepository.findAll().stream().map(artistMapper::toResponse).toList();
     }
 

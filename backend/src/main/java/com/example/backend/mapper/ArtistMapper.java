@@ -5,6 +5,7 @@ import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.model.Artist;
 import org.mapstruct.Mapper;
 
+
 @Mapper(componentModel = "spring")
 public interface ArtistMapper {
 
