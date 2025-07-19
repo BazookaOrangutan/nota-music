@@ -2,11 +2,8 @@ package com.example.backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -18,11 +15,8 @@ public class Artist {
 
     private String name;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "album_artist",
-            joinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"))
-    private Set<Album> albums = new HashSet<>();
+    @ManyToMany(mappedBy = "artists")
+    private List<Album> albums = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "feat_track_artist",

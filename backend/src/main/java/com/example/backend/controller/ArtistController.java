@@ -5,6 +5,7 @@ import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.model.Artist;
 import com.example.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class ArtistController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Artist createArtist(@RequestBody Artist artist) {
         return artistService.createArtist(artist);
     }

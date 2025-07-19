@@ -31,7 +31,7 @@ public class Track {
             inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
     private Set<Artist> featArtists = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_favourite_track",
             joinColumns = @JoinColumn(name = "track_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))

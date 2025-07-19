@@ -15,7 +15,5 @@ public class AlbumResponse {
 
     private LocalDate releaseDate;
 
-//    private String artist;
-
     private List<TrackResponse> tracks;
 }

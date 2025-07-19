@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.request.AlbumRequest;
+import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.exception.AlbumNotFoundException;
 import com.example.backend.mapper.AlbumMapper;
 import com.example.backend.model.Album;
@@ -9,9 +10,11 @@ import com.example.backend.model.Track;
 import com.example.backend.repository.AlbumRepository;
 import com.example.backend.service.AlbumService;
 import com.example.backend.service.ArtistService;
+import com.example.backend.service.FileStorageService;
 import com.example.backend.service.TrackService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +30,12 @@ public class AlbumServiceImpl implements AlbumService {
     private final AlbumMapper albumMapper;
 
     private final ArtistService artistService;
-
     private final TrackService trackService;
 
+    private final FileStorageService fileStorageService;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @Override
     @Transactional
@@ -40,18 +46,22 @@ public class AlbumServiceImpl implements AlbumService {
         Artist artist = artistService.getArtist(request.getArtistId());
         album.getArtists().add(artist);
 
-        List<Track> tracks = trackService.saveTracks(request.getTracks(), files, album);
+        Album createdAlbum = albumRepository.save(album);
 
-        album.setTracks(tracks);
+        List<Track> tracks = trackService.saveTracks(request.getTracks(), files, createdAlbum);
 
-        return albumRepository.save(album);
+        createdAlbum.setTracks(tracks);
+
+        return albumRepository.save(createdAlbum);
     }
 
     @Override
-    public Album getAlbumById(UUID id) {
+    public AlbumResponse getAlbumById(UUID id) {
 
-        return albumRepository.findById(id)
+        Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new AlbumNotFoundException(id));
+
+        return albumMapper.toResponse(album);
     }
 
     @Override
@@ -73,6 +83,13 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public void deleteAlbum(UUID id) {
+
+        try {
+            fileStorageService.deleteAlbum(id);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         albumRepository.deleteById(id);
     }
 }

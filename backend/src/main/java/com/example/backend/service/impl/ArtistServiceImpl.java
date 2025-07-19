@@ -6,12 +6,15 @@ import com.example.backend.exception.ArtistNotFoundException;
 import com.example.backend.mapper.AlbumMapper;
 import com.example.backend.mapper.ArtistMapper;
 import com.example.backend.model.Artist;
+import com.example.backend.repository.AlbumRepository;
 import com.example.backend.repository.ArtistRepository;
 import com.example.backend.service.ArtistService;
-import jakarta.transaction.Transactional;
+import com.example.backend.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +23,12 @@ import java.util.UUID;
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistRepository artistRepository;
+    private final AlbumRepository albumRepository;
     private final AlbumMapper albumMapper;
 
     private final ArtistMapper artistMapper;
+
+    private final FileStorageService fileStorageService;
 
     @Override
     public Artist createArtist(Artist artist) {
@@ -36,15 +42,15 @@ public class ArtistServiceImpl implements ArtistService {
                 .orElseThrow(() -> new ArtistNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<AlbumResponse> getAlbumsByArtistId(UUID id) {
 
         Artist artist = getArtist(id);
-
         return artist.getAlbums().stream().map(albumMapper::toResponse).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<ArtistResponse> getArtists() {
         return artistRepository.findAll().stream().map(artistMapper::toResponse).toList();
@@ -64,6 +70,22 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public void deleteArtist(UUID id) {
+
+        Artist artist = getArtist(id);
+
+        artist.getAlbums().forEach(album -> {
+            album.getArtists().remove(artist);
+            if (album.getArtists().isEmpty()){
+                try {
+                    fileStorageService.deleteAlbum(album.getId());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                albumRepository.delete(album);
+            }
+        });
+
         artistRepository.deleteById(id);
     }
 }

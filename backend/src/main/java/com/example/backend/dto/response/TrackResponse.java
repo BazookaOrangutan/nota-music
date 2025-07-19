@@ -7,8 +7,10 @@ import java.util.UUID;
 @Data
 public class TrackResponse {
 
-    private UUID trackId;
+    private UUID id;
 
     private String title;
+
+    private String filePath;
 
 }

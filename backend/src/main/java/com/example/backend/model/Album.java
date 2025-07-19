@@ -1,14 +1,13 @@
 package com.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -22,13 +21,14 @@ public class Album {
 
     private LocalDate releaseDate;
 
-    @JsonManagedReference // основная сторона
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
     private List<Track> tracks;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "album_artist",
+    @ManyToMany
+    @JoinTable(
+            name = "album_artist",
             joinColumns = @JoinColumn(name = "album_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
-    private Set<Artist> artists = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id")
+    )
+    private List<Artist> artists = new ArrayList<>();
 }

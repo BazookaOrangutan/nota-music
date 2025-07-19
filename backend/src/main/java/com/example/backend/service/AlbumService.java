@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.request.AlbumRequest;
+import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.model.Album;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +13,7 @@ public interface AlbumService {
 
     Album createAlbumWithTracks(AlbumRequest request, MultipartFile[] files) throws IOException;
 
-    Album getAlbumById(UUID id);
+    AlbumResponse getAlbumById(UUID id);
 
     List<Album> getAllAlbums();
 

@@ -4,6 +4,7 @@ import com.example.backend.dto.request.TrackRequest;
 import com.example.backend.dto.response.TrackResponse;
 import com.example.backend.model.Track;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TrackMapper {

@@ -38,7 +38,7 @@ public class TrackServiceImpl implements TrackService {
             Track track = trackMapper.toTrack(data.get(i));
             track.setAlbum(album);
 
-            String filePath = fileStorageService.saveFile(files[i]);
+            String filePath = fileStorageService.saveFile(files[i], album.getId());
             track.setFilePath(filePath);
 
             tracks.add(track);

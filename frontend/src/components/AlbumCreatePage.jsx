@@ -1,26 +1,20 @@
-
-
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import apiClient from "../api/apiClient.js";
 
 const AlbumCreatePage = () => {
+    const navigate = useNavigate();
+    const { artistId } = useParams(); // Получаем UUID из URL
+
     const [title, setTitle] = useState('');
+    const [releaseDate, setReleaseDate] = useState(''); // YYYY-MM-DD
     const [tracks, setTracks] = useState([]);
     const [files, setFiles] = useState([]);
     const [error, setError] = useState('');
-    const artistId = "b13b29b9-753f-4a87-84f8-2d647aafdd2b";
 
     const handleTrackChange = (index, value) => {
         const updatedTracks = [...tracks];
         updatedTracks[index].title = value;
-        setTracks(updatedTracks);
-    };
-    //
-    // const addTrack = () => {
-    //     setTracks([...tracks, { title: '' }]);
-    // };
-
-    const removeTrack = (index) => {
-        const updatedTracks = tracks.filter((_, i) => i !== index);
         setTracks(updatedTracks);
     };
 
@@ -33,25 +27,30 @@ const AlbumCreatePage = () => {
 
         setFiles(selectedFiles);
 
-        // Автоматическое заполнение треков из имён файлов (опционально)
         const trackList = selectedFiles.map((file) => ({
             title: file.name.replace(/\.[^/.]+$/, ""), // Удаляем расширение
         }));
         setTracks(trackList);
         setError('');
-
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!title || tracks.length === 0 || files.length === 0) {
+        if (!title || !releaseDate || tracks.length === 0 || files.length === 0) {
             setError('Заполните все поля и загрузите хотя бы один трек.');
+            return;
+        }
+
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(releaseDate)) {
+            setError('Дата релиза должна быть в формате YYYY-MM-DD');
             return;
         }
 
         const albumData = {
             title,
+            releaseDate,
             tracks,
             artistId,
         };
@@ -62,32 +61,30 @@ const AlbumCreatePage = () => {
             { type: 'application/json' }
         );
         formData.append('album', albumJson, 'album.json');
+
         files.forEach((file) => {
             formData.append('files', file);
         });
 
         try {
-            const response = await fetch('http://localhost:8080/api/v1/albums', {
-                method: 'POST',
-                body: formData,
+            await apiClient.post('/albums', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
             });
 
-            if (!response.ok) {
-                throw new Error('Ошибка при создании альбома');
-            }
-
             alert('Альбом успешно создан!');
-            // Очистка формы
-            setTitle('');
-            setTracks([]);
-            setFiles([]);
+            navigate(`/artists/${artistId}`);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message);
         }
     };
 
     return (
         <div style={{ padding: '2rem' }}>
+            <button onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
+                ←
+            </button>
             <h2>Создать альбом</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
@@ -98,6 +95,19 @@ const AlbumCreatePage = () => {
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            required
+                            style={{ width: '100%', marginBottom: '1rem' }}
+                        />
+                    </label>
+                </div>
+
+                <div>
+                    <label>
+                        Дата релиза (YYYY-MM-DD):
+                        <input
+                            type="date"
+                            value={releaseDate}
+                            onChange={(e) => setReleaseDate(e.target.value)}
                             required
                             style={{ width: '100%', marginBottom: '1rem' }}
                         />
@@ -117,16 +127,10 @@ const AlbumCreatePage = () => {
                                         placeholder={`Название трека ${index + 1}`}
                                         style={{ width: '80%' }}
                                     />
-                                    <button type="button" onClick={() => removeTrack(index)} style={{ marginLeft: '0.5rem' }}>
-                                        Удалить
-                                    </button>
                                 </li>
                             ))}
                         </ul>
                     </label>
-                    {/*<button type="button" onClick={addTrack}>*/}
-                    {/*    Добавить трек*/}
-                    {/*</button>*/}
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
