@@ -17,6 +17,8 @@ public interface ArtistService {
 
     List<ArtistResponse> getArtists();
 
+    List<Artist> getArtistsByIds(List<UUID> ids);
+
     Artist updateArtist(UUID id, Artist artist);
 
     void deleteArtist(UUID id);

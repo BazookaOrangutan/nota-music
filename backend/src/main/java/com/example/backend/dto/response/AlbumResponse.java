@@ -16,4 +16,6 @@ public class AlbumResponse {
     private LocalDate releaseDate;
 
     private List<TrackResponse> tracks;
+
+    private List<UUID> artistIds;
 }

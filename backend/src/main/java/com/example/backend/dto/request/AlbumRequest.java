@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 public class AlbumRequest {
 
-    private UUID artistId;
+    private List<UUID> artistIds;
 
     private String title;
 

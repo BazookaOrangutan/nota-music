@@ -57,6 +57,11 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
+    public List<Artist> getArtistsByIds(List<UUID> ids) {
+        return artistRepository.findAllById(ids);
+    }
+
+    @Override
     public Artist updateArtist(UUID id, Artist artist) {
 
         if (!artistRepository.existsById(id)) {

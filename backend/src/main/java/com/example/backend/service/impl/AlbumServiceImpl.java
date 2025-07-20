@@ -43,8 +43,8 @@ public class AlbumServiceImpl implements AlbumService {
 
         Album album = albumMapper.fromRequest(request);
 
-        Artist artist = artistService.getArtist(request.getArtistId());
-        album.getArtists().add(artist);
+        List<Artist> artists = artistService.getArtistsByIds(request.getArtistIds());
+        album.getArtists().addAll(artists);
 
         Album createdAlbum = albumRepository.save(album);
 

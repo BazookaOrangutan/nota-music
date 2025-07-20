@@ -1,6 +1,5 @@
-// src/context/PlayerContext.jsx
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import apiClient from "../api/apiClient.js";
 
 export const PlayerContext = createContext();
 
@@ -8,27 +7,57 @@ export const PlayerProvider = ({ children }) => {
     const [album, setAlbum] = useState(null);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [audio] = useState(new Audio());
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
+    const [artists, setArtists] = useState([]);
 
-    // --- Изменённый код ---
+    const audioRef = useRef(new Audio());
+
+    const loadTrack = async (albumToPlay, trackIndex) => {
+        const trackUrl = albumToPlay.tracks[trackIndex].filePath
+            .replace('uploads\\', '')
+            .replace(/\\/g, '/');
+
+        try {
+            const response = await apiClient.get(`/files/tracks/${trackUrl}`, {
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([response.data], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(blob);
+
+            if (audioRef.current.src) {
+                URL.revokeObjectURL(audioRef.current.src);
+            }
+
+            audioRef.current.src = url;
+
+            setIsPlaying(true);
+
+            return url;
+        } catch (error) {
+            console.error('Ошибка загрузки аудио:', error);
+            return null;
+        }
+    };
+
     const play = (albumToPlay, trackIndex = 0) => {
-        console.log(trackIndex);
         setAlbum(albumToPlay);
         setCurrentTrackIndex(trackIndex);
         setIsPlaying(true);
     };
-    // --- /Изменённый код ---
+
 
     useEffect(() => {
-        if (album && album.tracks.length > 0) {
-            const trackUrl = album.tracks[currentTrackIndex].filePath
-                .replace('uploads\\', '')
-                .replace(/\\/g, '/');
-            const cleanTrackUrl = encodeURIComponent(trackUrl);
+        if (!album || !album.tracks || album.tracks.length === 0) return;
 
-            audio.src = `http://localhost:8080/api/v1/files/tracks/${trackUrl}`;
+        const trackIndex = currentTrackIndex;
+
+        const loadAndSetupAudio = async () => {
+            const url = await loadTrack(album, trackIndex);
+            if (!url) return;
+
+            const audio = audioRef.current;
 
             const onLoadedMetadata = () => {
                 setDuration(audio.duration);
@@ -42,8 +71,8 @@ export const PlayerProvider = ({ children }) => {
             };
 
             const onEnded = () => {
-                if (currentTrackIndex < album.tracks.length - 1) {
-                    setCurrentTrackIndex(currentTrackIndex + 1);
+                if (trackIndex < album.tracks.length - 1) {
+                    setCurrentTrackIndex(trackIndex + 1);
                 } else {
                     setIsPlaying(false);
                 }
@@ -58,21 +87,42 @@ export const PlayerProvider = ({ children }) => {
                 audio.removeEventListener('timeupdate', onTimeUpdate);
                 audio.removeEventListener('ended', onEnded);
             };
-        }
+        };
+
+        loadAndSetupAudio();
     }, [album, currentTrackIndex]);
 
-    useEffect(() => {
-        const updateTime = () => {
-            setCurrentTime(audio.currentTime);
-        };
 
-        const onEnd = () => {
-            if (currentTrackIndex < album.tracks.length - 1) {
-                setCurrentTrackIndex(currentTrackIndex + 1);
-            } else {
-                setIsPlaying(false); // закончили альбом
-            }
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (isPlaying) {
+            audio.play();
+        } else {
+            audio.pause();
+        }
+
+        return () => {
+            // if (audio.src) {
+            //     URL.revokeObjectURL(audio.src);
+            // }
         };
+    }, [isPlaying]);
+
+    // Обновление времени
+    const updateTime = () => {
+        setCurrentTime(audioRef.current.currentTime);
+    };
+
+    const onEnd = () => {
+        if (currentTrackIndex < album.tracks.length - 1) {
+            setCurrentTrackIndex(currentTrackIndex + 1);
+        } else {
+            setIsPlaying(false);
+        }
+    };
+
+    useEffect(() => {
+        const audio = audioRef.current;
 
         audio.addEventListener('timeupdate', updateTime);
         audio.addEventListener('ended', onEnd);
@@ -81,20 +131,14 @@ export const PlayerProvider = ({ children }) => {
             audio.removeEventListener('timeupdate', updateTime);
             audio.removeEventListener('ended', onEnd);
         };
-    }, [audio, album, currentTrackIndex]);
+    }, [album]);
 
     const togglePlayPause = () => {
-        if (isPlaying) {
-            audio.pause();
-            setIsPlaying(false);
-        } else {
-            audio.play();
-            setIsPlaying(true);
-        }
+        setIsPlaying(!isPlaying);
     };
 
     const nextTrack = () => {
-        if (currentTrackIndex < album.tracks.length - 1) {
+        if (currentTrackIndex < album?.tracks.length - 1) {
             setCurrentTrackIndex(currentTrackIndex + 1);
         }
     };
@@ -107,7 +151,7 @@ export const PlayerProvider = ({ children }) => {
 
     const seek = (e) => {
         const newTime = e.target.value;
-        audio.currentTime = newTime;
+        audioRef.current.currentTime = newTime;
         setCurrentTime(newTime);
     };
 
@@ -123,14 +167,14 @@ export const PlayerProvider = ({ children }) => {
                 album,
                 currentTrackIndex,
                 isPlaying,
-                play, // теперь принимает альбом и индекс трека
+                play,
                 togglePlayPause,
                 nextTrack,
                 prevTrack,
                 seek,
                 currentTime,
                 duration,
-                formatTime
+                formatTime,
             }}
         >
             {children}

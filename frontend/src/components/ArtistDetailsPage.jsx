@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import axios from 'axios';
 import apiClient from "../api/apiClient.js";
+import {AuthContext} from "../context/AuthContext.jsx";
 
 const ArtistDetailsPage = () => {
     const {artistId} = useParams();
@@ -9,6 +10,7 @@ const ArtistDetailsPage = () => {
     const [artist, setArtist] = useState(null);
     const [albums, setAlbums] = useState([]);
     const [err, setError] = useState('');
+    const { hasRole } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -71,26 +73,26 @@ const ArtistDetailsPage = () => {
                             <Link to={`/albums/${album.id}`}>
                                 {album.title} ({album.releaseDate})
                             </Link>
-                            <button
+                            {hasRole('ROLE_ADMIN') && (<button
                                 onClick={() => handleDeleteAlbum(album.id)}
                                 style={{marginLeft: '1rem', color: 'red', border: 'none', background: 'transparent'}}
                             >
                                 🗑️
-                            </button>
+                            </button>)}
                         </li>
                     ))}
                 </ul>
             )}
-            <div style={{ marginTop: '2rem' }}>
-                <Link to={`/artists/${artistId}/create-album`} style={{ textDecoration: 'none' }}>
+            {hasRole('ROLE_ADMIN') && (<div style={{marginTop: '2rem'}}>
+                <Link to={`/artists/${artistId}/create-album`} style={{textDecoration: 'none'}}>
                     <button>Добавить альбом</button>
                 </Link>
-            </div>
+            </div>)}
 
             <div style={{ marginTop: '1rem' }}>
-                <button onClick={handleDeleteArtist} style={{ color: 'red' }}>
+                {hasRole('ROLE_ADMIN') && (<button onClick={handleDeleteArtist} style={{color: 'red'}}>
                     Удалить исполнителя
-                </button>
+                </button>)}
             </div>
         </div>
     );

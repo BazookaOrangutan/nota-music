@@ -1,16 +1,49 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from "../api/apiClient.js";
+import Select from 'react-select';
 
 const AlbumCreatePage = () => {
     const navigate = useNavigate();
-    const { artistId } = useParams(); // Получаем UUID из URL
-
+    const { artistId } = useParams();
     const [title, setTitle] = useState('');
-    const [releaseDate, setReleaseDate] = useState(''); // YYYY-MM-DD
+    const [releaseDate, setReleaseDate] = useState('');
     const [tracks, setTracks] = useState([]);
     const [files, setFiles] = useState([]);
     const [error, setError] = useState('');
+    const [additionalArtists, setAdditionalArtists] = useState([]);
+    const [allArtists, setAllArtists] = useState([]);
+    const [mainArtist, setMainArtist] = useState(null);
+
+    // Получаем основного исполнителя (имя)
+    useEffect(() => {
+        const fetchMainArtist = async () => {
+            try {
+                const response = await apiClient.get(`/artists/${artistId}`);
+                setMainArtist(response.data);
+            } catch (err) {
+                setError('Ошибка загрузки основного исполнителя');
+            }
+        };
+
+        fetchMainArtist();
+    }, [artistId]);
+
+    useEffect(() => {
+        const fetchArtists = async () => {
+            try {
+                const response = await apiClient.get('/artists');
+                const artists = response.data;
+
+                const filteredArtists = artists.filter(a => a.id !== artistId);
+                setAllArtists(filteredArtists);
+            } catch (err) {
+                setError('Ошибка загрузки исполнителей');
+            }
+        };
+
+        fetchArtists();
+    }, [artistId, mainArtist]);
 
     const handleTrackChange = (index, value) => {
         const updatedTracks = [...tracks];
@@ -28,7 +61,7 @@ const AlbumCreatePage = () => {
         setFiles(selectedFiles);
 
         const trackList = selectedFiles.map((file) => ({
-            title: file.name.replace(/\.[^/.]+$/, ""), // Удаляем расширение
+            title: file.name.replace(/\.[^/.]+$/, ""),
         }));
         setTracks(trackList);
         setError('');
@@ -52,7 +85,7 @@ const AlbumCreatePage = () => {
             title,
             releaseDate,
             tracks,
-            artistId,
+            artistIds: [artistId, ...(additionalArtists.map(a => a.value))],
         };
 
         const formData = new FormData();
@@ -79,6 +112,11 @@ const AlbumCreatePage = () => {
             setError(err.response?.data?.message || err.message);
         }
     };
+
+    const artistOptions = allArtists.map(artist => ({
+        value: artist.id,
+        label: artist.name,
+    }));
 
     return (
         <div style={{ padding: '2rem' }}>
@@ -110,6 +148,36 @@ const AlbumCreatePage = () => {
                             onChange={(e) => setReleaseDate(e.target.value)}
                             required
                             style={{ width: '100%', marginBottom: '1rem' }}
+                        />
+                    </label>
+                </div>
+
+                {mainArtist && (
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label>
+                            <strong>Исполнитель:</strong>
+                            <p style={{ margin: '0.5rem 0', fontWeight: 'bold' }}>
+                                {mainArtist?.name || 'Загрузка...'}
+                            </p>
+                        </label>
+                    </div>
+                )}
+
+                <div>
+                    <label>
+                        Соавторы альбома:
+                        <Select
+                            isMulti
+                            options={artistOptions}
+                            value={additionalArtists}
+                            onChange={setAdditionalArtists}
+                            placeholder="Выберите исполнителей"
+                            noOptionsMessage={() => 'Нет доступных исполнителей'}
+                            styles={{option: (base) => ({
+                                    ...base,
+                                    backgroundColor: '#f9f9f9',
+                                    color: '#333',
+                                })}}
                         />
                     </label>
                 </div>
