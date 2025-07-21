@@ -33,7 +33,7 @@ const ArtistDetailsPage = () => {
         if (!window.confirm('Удалить этот альбом?')) return;
 
         try {
-            await axios.delete(`http://localhost:8080/api/v1/albums/${albumId}`);
+            await apiClient.delete(`/albums/${albumId}`);
             setAlbums(albums.filter(a => a.id !== albumId));
         } catch (err) {
             setError('Не удалось удалить альбом');
