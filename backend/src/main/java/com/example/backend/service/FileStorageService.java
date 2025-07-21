@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -9,12 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerMapping;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -66,27 +66,64 @@ public class FileStorageService {
         }
     }
 
-    public Resource serveTrack(HttpServletRequest request) {
-
-        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-
-        String filename = path.replace("/api/v1/files/tracks/albums", "");
-
-        String decodedFilename = URLDecoder.decode(filename, StandardCharsets.UTF_8);
-
-        Path filePath = Paths.get(UPLOAD_DIR, decodedFilename);
+    public ResponseEntity<?> serveTrack(HttpServletRequest request) {
 
         try {
-            Resource resource = new UrlResource(filePath.toUri());
+            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            String filename = path.replace("/api/v1/files/tracks/albums", "");
 
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new FileNotFoundException("Файл не найден: " + filePath);
+            String decodedFilename = URLDecoder.decode(filename, StandardCharsets.UTF_8);
+
+            Path filePath = Paths.get(UPLOAD_DIR, decodedFilename);
+
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
             }
 
-            return resource;
+            long fileLength = Files.size(filePath);
+
+
+            String rangeHeader = request.getHeader("Range");
+            if (rangeHeader == null || !rangeHeader.startsWith("bytes=")) {
+
+                Resource resource = new UrlResource(filePath.toUri());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("audio/mpeg"))
+                        .contentLength(fileLength)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                        .body(resource);
+            }
+
+
+            long[] range = parseRange(rangeHeader, fileLength);
+            long start = range[0];
+            long end = range[1];
+            long length = end - start + 1;
+
+            InputStreamResource inputStreamResource = new InputStreamResource(
+                    new BufferedInputStream(new FileInputStream(filePath.toFile())) {
+                        {
+                            skip(start);
+                        }
+                    });
+
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .contentType(MediaType.parseMediaType("audio/mpeg"))
+                    .contentLength(length)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                    .header(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + fileLength)
+                    .body(inputStreamResource);
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось загрузить файл", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Файл не найден");
         }
+
+    }
+
+    private long[] parseRange(String rangeHeader, long fileLength) {
+        String[] ranges = rangeHeader.substring(6).split("-");
+        long start = Long.parseLong(ranges[0]);
+        long end = Math.min(fileLength - 1, ranges.length > 1 ? Long.parseLong(ranges[1]) : fileLength - 1);
+        return new long[]{start, end};
     }
 }

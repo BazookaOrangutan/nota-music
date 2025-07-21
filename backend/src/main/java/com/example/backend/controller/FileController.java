@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import com.example.backend.service.FileStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +20,7 @@ public class FileController {
     private final FileStorageService fileStorageService;
 
     @GetMapping("/tracks/**")
-    public ResponseEntity<Resource> serveTrack(HttpServletRequest request) {
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("audio/mpeg"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                .body(fileStorageService.serveTrack(request));
+    public ResponseEntity<?> serveTrack(HttpServletRequest request) {
+        return fileStorageService.serveTrack(request);
     }
 }
