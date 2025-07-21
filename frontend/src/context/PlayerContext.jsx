@@ -9,14 +9,13 @@ export const PlayerProvider = ({ children }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
-    const [artists, setArtists] = useState([]);
 
     const audioRef = useRef(new Audio());
 
     const loadTrack = async (albumToPlay, trackIndex) => {
         const trackUrl = albumToPlay.tracks[trackIndex].filePath
-            .replace('uploads\\', '')
-            .replace(/\\/g, '/');
+            .replace(/\\/g, '/')
+            .replace('uploads/', '');
 
         try {
             const response = await apiClient.get(`/files/tracks/${trackUrl}`, {
