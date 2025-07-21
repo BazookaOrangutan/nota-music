@@ -34,9 +34,6 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final FileStorageService fileStorageService;
 
-    @Value("${upload.path}")
-    private String uploadPath;
-
     @Override
     @Transactional
     public Album createAlbumWithTracks(AlbumRequest request, MultipartFile[] files) throws IOException {
