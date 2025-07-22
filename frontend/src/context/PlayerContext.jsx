@@ -45,9 +45,11 @@ export const PlayerProvider = ({ children }) => {
             .replace(/\\/g, '/')
             .replace('uploads/', '');
 
-        audioRef.current.src = `/api/v1/files/tracks/${trackPath}?token=${token}`;
+        const url = `/api/v1/files/tracks/${trackPath}?token=${token}`;
+        audioRef.current.src = url;
         audioRef.current.load();
         setIsPlaying(true);
+        return url;
     };
 
     const play = (albumToPlay, trackIndex = 0) => {
@@ -87,15 +89,25 @@ export const PlayerProvider = ({ children }) => {
                 }
             };
 
+            // audio.addEventListener('loadedmetadata', onLoadedMetadata);
+            // audio.addEventListener('timeupdate', onTimeUpdate);
+            // audio.addEventListener('ended', onEnded);
+            //
+            // return () => {
+            //     audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            //     audio.removeEventListener('timeupdate', onTimeUpdate);
+            //     audio.removeEventListener('ended', onEnded);
+            // };
+
+            audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('timeupdate', onTimeUpdate);
+            audio.removeEventListener('ended', onEnded);
+
+
             audio.addEventListener('loadedmetadata', onLoadedMetadata);
             audio.addEventListener('timeupdate', onTimeUpdate);
             audio.addEventListener('ended', onEnded);
 
-            return () => {
-                audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-                audio.removeEventListener('timeupdate', onTimeUpdate);
-                audio.removeEventListener('ended', onEnded);
-            };
         };
 
         loadAndSetupAudio();
@@ -103,17 +115,14 @@ export const PlayerProvider = ({ children }) => {
 
     useEffect(() => {
         const audio = audioRef.current;
-        if (isPlaying) {
-            audio.play();
-        } else {
-            audio.pause();
-        }
 
-        return () => {
-            // if (audio.src) {
-            //     URL.revokeObjectURL(audio.src);
-            // }
-        };
+        if(audio.src){
+            if (isPlaying) {
+                audio.play().catch((e) => console.error("Play error:", e));
+            } else {
+                audio.pause();
+            }
+        }
     }, [isPlaying]);
 
     const updateTime = () => {
@@ -121,11 +130,14 @@ export const PlayerProvider = ({ children }) => {
     };
 
     const onEnd = () => {
-        if (currentTrackIndex < album.tracks.length - 1) {
-            setCurrentTrackIndex(currentTrackIndex + 1);
-        } else {
-            setIsPlaying(false);
-        }
+        setCurrentTrackIndex(prevIndex => {
+            if (prevIndex < album.tracks.length - 1) {
+                return prevIndex + 1;
+            } else {
+                setIsPlaying(false);
+                return prevIndex;
+            }
+        });
     };
 
     useEffect(() => {
@@ -157,7 +169,7 @@ export const PlayerProvider = ({ children }) => {
     };
 
     const seek = (e) => {
-        const newTime = e.target.value;
+        const newTime = parseFloat(e.target.value);
         audioRef.current.currentTime = newTime;
         setCurrentTime(newTime);
     };

@@ -49,7 +49,7 @@ const MusicPlayer = () => {
                 <input
                     type="range"
                     min="0"
-                    max={duration}
+                    max={duration || 0}
                     value={currentTime}
                     onChange={seek}
                     style={{ width: '100%' }}
