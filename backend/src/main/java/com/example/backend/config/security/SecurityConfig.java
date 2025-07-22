@@ -39,10 +39,12 @@ public class SecurityConfig {
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
                     corsConfiguration.setAllowCredentials(true);
+                    corsConfiguration.setExposedHeaders(List.of("Authorization", "Cache-Control", "Content-Type",
+                            "Accept-Ranges", "Content-Length", "Content-Range", "Content-Type"));
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("api/v1/auth/**").permitAll()
+                        .requestMatchers("api/v1/auth/**", "api/v1/files/tracks/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

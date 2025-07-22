@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import apiClient from "../api/apiClient.js";
+import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 
 export const PlayerContext = createContext();
 
@@ -12,32 +11,43 @@ export const PlayerProvider = ({ children }) => {
 
     const audioRef = useRef(new Audio());
 
+    // const loadTrack = async (albumToPlay, trackIndex) => {
+    //     const trackUrl = albumToPlay.tracks[trackIndex].filePath
+    //         .replace(/\\/g, '/')
+    //         .replace('uploads/', '');
+    //
+    //     try {
+    //         const response = await apiClient.get(`/files/tracks/${trackUrl}`, {
+    //             responseType: 'blob',
+    //         });
+    //
+    //         const blob = new Blob([response.data], { type: 'audio/mpeg' });
+    //         const url = URL.createObjectURL(blob);
+    //
+    //         if (audioRef.current.src) {
+    //             URL.revokeObjectURL(audioRef.current.src);
+    //         }
+    //
+    //         audioRef.current.src = url;
+    //
+    //         setIsPlaying(true);
+    //
+    //         return url;
+    //     } catch (error) {
+    //         console.error('Ошибка загрузки аудио:', error);
+    //         return null;
+    //     }
+    // };
+
     const loadTrack = async (albumToPlay, trackIndex) => {
-        const trackUrl = albumToPlay.tracks[trackIndex].filePath
+        const token = localStorage.getItem('token');
+        const trackPath = albumToPlay.tracks[trackIndex].filePath
             .replace(/\\/g, '/')
             .replace('uploads/', '');
 
-        try {
-            const response = await apiClient.get(`/files/tracks/${trackUrl}`, {
-                responseType: 'blob',
-            });
-
-            const blob = new Blob([response.data], { type: 'audio/mpeg' });
-            const url = URL.createObjectURL(blob);
-
-            if (audioRef.current.src) {
-                URL.revokeObjectURL(audioRef.current.src);
-            }
-
-            audioRef.current.src = url;
-
-            setIsPlaying(true);
-
-            return url;
-        } catch (error) {
-            console.error('Ошибка загрузки аудио:', error);
-            return null;
-        }
+        audioRef.current.src = `/api/v1/files/tracks/${trackPath}?token=${token}`;
+        audioRef.current.load();
+        setIsPlaying(true);
     };
 
     const play = (albumToPlay, trackIndex = 0) => {
@@ -91,7 +101,6 @@ export const PlayerProvider = ({ children }) => {
         loadAndSetupAudio();
     }, [album, currentTrackIndex]);
 
-
     useEffect(() => {
         const audio = audioRef.current;
         if (isPlaying) {
@@ -107,7 +116,6 @@ export const PlayerProvider = ({ children }) => {
         };
     }, [isPlaying]);
 
-    // Обновление времени
     const updateTime = () => {
         setCurrentTime(audioRef.current.currentTime);
     };

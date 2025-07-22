@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -8,6 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
@@ -26,9 +31,13 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class FileStorageService {
 
     private static final String UPLOAD_DIR = "uploads/albums";
+
+    private final JwtService jwtService;
+    private final UserService userDetailsService;
 
     public String saveFile(MultipartFile file, UUID albumId) throws IOException {
         String uniqueFileName = file.getOriginalFilename();
@@ -69,6 +78,24 @@ public class FileStorageService {
     public ResponseEntity<?> serveTrack(HttpServletRequest request) {
 
         try {
+
+            String token = request.getParameter("token");
+
+            if (token == null || token.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is missing");
+            }
+
+            String username = jwtService.extractUserName(token);
+            UserDetails userDetails = userDetailsService.getByUsername(username);
+            if (username == null || !jwtService.isTokenValid(token, userDetails)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+            }
+
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
+
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             String filename = path.replace("/api/v1/files/tracks/albums", "");
 

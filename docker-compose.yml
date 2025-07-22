@@ -25,6 +25,8 @@ services:
       JWT_KEY: ${JWT_KEY}
     depends_on:
       - postgres
+    volumes:
+      - uploads_data:/uploads
     restart: always
     networks:
       - nota-music-network
@@ -57,6 +59,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
 
 networks:
   nota-music-network:
