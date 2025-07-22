@@ -16,8 +16,9 @@ services:
 
   certbot:
     image: certbot/certbot:latest
+    entrypoint: sh -c
     command: >
-      sh -c "sleep 10 && certbot certonly \
+      "sleep 10 && certbot certonly \
         --webroot --webroot-path=/var/www/certbot \
         --email kolyache280@gmail.com \
         --agree-tos \
