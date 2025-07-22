@@ -14,19 +14,21 @@ services:
     networks:
       - nota-music-network
 
-  certbot:
+  certbot-renew:
     image: certbot/certbot:latest
     entrypoint: sh
     command:
       - -c
-      - 'sleep 10 && certbot certonly --webroot --webroot-path=/var/www/certbot --email kolyache280@gmail.com --agree-tos --no-eff-email -d nota-music.ru -d www.nota-music.ru --non-interactive || sleep 3600'
+      - 'certbot renew --webroot --webroot-path=/var/www/certbot && nginx -s reload || sleep 3600'
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
-    depends_on:
-      - nginx
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - nota-music-network
+    depends_on:
+      - nginx
+    restart: "no"
 
   backend:
     build:
