@@ -14,7 +14,6 @@ import com.example.backend.service.FileStorageService;
 import com.example.backend.service.TrackService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,7 +68,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public Album updateAlbum(UUID id, Album album) {
 
-        if(!albumRepository.existsById(id)) {
+        if (!albumRepository.existsById(id)) {
             throw new AlbumNotFoundException(id);
         }
 

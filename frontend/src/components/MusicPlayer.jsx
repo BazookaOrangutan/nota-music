@@ -1,7 +1,6 @@
-// src/components/MusicPlayer.jsx
-
 import React from 'react';
 import { usePlayer } from '../context/PlayerContext';
+import './MusicPlayer.css';
 
 const MusicPlayer = () => {
     const {
@@ -14,7 +13,7 @@ const MusicPlayer = () => {
         duration,
         formatTime,
         album,
-        currentTrackIndex
+        currentTrackIndex,
     } = usePlayer();
 
     if (!album || !album.tracks[currentTrackIndex]) return null;
@@ -22,39 +21,35 @@ const MusicPlayer = () => {
     const currentTrack = album.tracks[currentTrackIndex];
 
     return (
-        <div style={{
-            position: 'fixed',
-            bottom: 0,
-            width: '100%',
-            backgroundColor: '#111',
-            color: 'white',
-            padding: '10px',
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            zIndex: 1000
-        }}>
-            <div>
-                <h4>{currentTrack.title}</h4>
-                <p>{album.title}</p>
+        <div className="music-player">
+            <div className="player-track-info">
+                <h4 className="track-title">{currentTrack.title}</h4>
+                <p className="album-title">{album.title}</p>
             </div>
-            <div>
-                <button onClick={prevTrack}>⏮️</button>
-                <button onClick={togglePlayPause}>
+
+            <div className="player-controls">
+                <button onClick={prevTrack} className="control-btn" aria-label="Previous track">
+                    ⏮️
+                </button>
+                <button onClick={togglePlayPause} className="control-btn big-btn" aria-label="Play/Pause">
                     {isPlaying ? '⏸️' : '▶️'}
                 </button>
-                <button onClick={nextTrack}>⏭️</button>
+                <button onClick={nextTrack} className="control-btn" aria-label="Next track">
+                    ⏭️
+                </button>
             </div>
-            <div style={{ width: '30%' }}>
+
+            <div className="player-progress">
                 <input
                     type="range"
                     min="0"
                     max={duration || 0}
                     value={currentTime}
                     onChange={seek}
-                    style={{ width: '100%' }}
+                    className="progress-slider"
+                    aria-label="Progress"
                 />
-                <small>
+                <small className="time-display">
                     {formatTime(currentTime)} / {formatTime(duration)}
                 </small>
             </div>

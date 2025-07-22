@@ -80,7 +80,7 @@ public class ArtistServiceImpl implements ArtistService {
 
         artist.getAlbums().forEach(album -> {
             album.getArtists().remove(artist);
-            if (album.getArtists().isEmpty()){
+            if (album.getArtists().isEmpty()) {
                 try {
                     fileStorageService.deleteAlbum(album.getId());
                 } catch (IOException e) {

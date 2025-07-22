@@ -11,34 +11,6 @@ export const PlayerProvider = ({ children }) => {
 
     const audioRef = useRef(new Audio());
 
-    // const loadTrack = async (albumToPlay, trackIndex) => {
-    //     const trackUrl = albumToPlay.tracks[trackIndex].filePath
-    //         .replace(/\\/g, '/')
-    //         .replace('uploads/', '');
-    //
-    //     try {
-    //         const response = await apiClient.get(`/files/tracks/${trackUrl}`, {
-    //             responseType: 'blob',
-    //         });
-    //
-    //         const blob = new Blob([response.data], { type: 'audio/mpeg' });
-    //         const url = URL.createObjectURL(blob);
-    //
-    //         if (audioRef.current.src) {
-    //             URL.revokeObjectURL(audioRef.current.src);
-    //         }
-    //
-    //         audioRef.current.src = url;
-    //
-    //         setIsPlaying(true);
-    //
-    //         return url;
-    //     } catch (error) {
-    //         console.error('Ошибка загрузки аудио:', error);
-    //         return null;
-    //     }
-    // };
-
     const loadTrack = async (albumToPlay, trackIndex) => {
         const token = localStorage.getItem('token');
         const trackPath = albumToPlay.tracks[trackIndex].filePath
@@ -89,20 +61,9 @@ export const PlayerProvider = ({ children }) => {
                 }
             };
 
-            // audio.addEventListener('loadedmetadata', onLoadedMetadata);
-            // audio.addEventListener('timeupdate', onTimeUpdate);
-            // audio.addEventListener('ended', onEnded);
-            //
-            // return () => {
-            //     audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-            //     audio.removeEventListener('timeupdate', onTimeUpdate);
-            //     audio.removeEventListener('ended', onEnded);
-            // };
-
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
             audio.removeEventListener('timeupdate', onTimeUpdate);
             audio.removeEventListener('ended', onEnded);
-
 
             audio.addEventListener('loadedmetadata', onLoadedMetadata);
             audio.addEventListener('timeupdate', onTimeUpdate);

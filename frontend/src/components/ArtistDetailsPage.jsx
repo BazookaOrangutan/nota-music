@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import axios from 'axios';
 import apiClient from "../api/apiClient.js";
 import {AuthContext} from "../context/AuthContext.jsx";
 
@@ -10,7 +9,7 @@ const ArtistDetailsPage = () => {
     const [artist, setArtist] = useState(null);
     const [albums, setAlbums] = useState([]);
     const [err, setError] = useState('');
-    const { hasRole } = useContext(AuthContext);
+    const {hasRole} = useContext(AuthContext);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,7 +55,7 @@ const ArtistDetailsPage = () => {
 
     return (
         <div style={{padding: '2rem'}}>
-            <button onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
+            <button onClick={() => navigate('/artists')} style={{marginBottom: '1rem'}}>
                 ←
             </button>
 
@@ -69,7 +68,8 @@ const ArtistDetailsPage = () => {
             ) : (
                 <ul>
                     {albums.map(album => (
-                        <li key={album.id} style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <li key={album.id}
+                            style={{marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between'}}>
                             <Link to={`/albums/${album.id}`}>
                                 {album.title} ({album.releaseDate})
                             </Link>
@@ -89,7 +89,7 @@ const ArtistDetailsPage = () => {
                 </Link>
             </div>)}
 
-            <div style={{ marginTop: '1rem' }}>
+            <div style={{marginTop: '1rem'}}>
                 {hasRole('ROLE_ADMIN') && (<button onClick={handleDeleteArtist} style={{color: 'red'}}>
                     Удалить исполнителя
                 </button>)}

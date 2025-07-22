@@ -15,7 +15,6 @@ const AlbumCreatePage = () => {
     const [allArtists, setAllArtists] = useState([]);
     const [mainArtist, setMainArtist] = useState(null);
 
-    // Получаем основного исполнителя (имя)
     useEffect(() => {
         const fetchMainArtist = async () => {
             try {

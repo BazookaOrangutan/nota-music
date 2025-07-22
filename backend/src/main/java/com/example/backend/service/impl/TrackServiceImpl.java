@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +59,7 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public Track updateTrack(UUID id, Track track) {
 
-        if(!trackRepository.existsById(id)) {
+        if (!trackRepository.existsById(id)) {
             throw new TrackNotFoundException(id);
         }
 

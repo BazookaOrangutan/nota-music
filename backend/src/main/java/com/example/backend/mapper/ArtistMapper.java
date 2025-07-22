@@ -8,9 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Mapper(componentModel = "spring", uses = {AlbumMapper.class})

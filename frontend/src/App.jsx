@@ -16,19 +16,21 @@ function App() {
         <Router>
             <AuthProvider>
                 <PlayerProvider>
-                    <Routes>
-                        <Route path="/sign-up" element={<SignUpPage/>}/>
-                        <Route path="/sign-in" element={<SignInPage/>}/>
+                    <div style={{paddingBottom: '150px'}}>
+                        <Routes>
+                            <Route path="/sign-up" element={<SignUpPage/>}/>
+                            <Route path="/sign-in" element={<SignInPage/>}/>
 
-                        <Route element={<PrivateRoute/>}>
-                            <Route path="/artists" element={<ArtistsPage/>}/>
-                            <Route path="/artists/:artistId" element={<ArtistDetailsPage/>}/>
-                            <Route path="/artists/:artistId/create-album" element={<AlbumCreatePage/>}/>
-                            <Route path="/albums/:albumId" element={<AlbumDetailsPage/>}/>
-                        </Route>
+                            <Route element={<PrivateRoute/>}>
+                                <Route path="/artists" element={<ArtistsPage/>}/>
+                                <Route path="/artists/:artistId" element={<ArtistDetailsPage/>}/>
+                                <Route path="/artists/:artistId/create-album" element={<AlbumCreatePage/>}/>
+                                <Route path="/albums/:albumId" element={<AlbumDetailsPage/>}/>
+                            </Route>
 
-                        <Route path="*" element={<Navigate to="/sign-in"/>}/>
-                    </Routes>
+                            <Route path="*" element={<Navigate to="/sign-in"/>}/>
+                        </Routes>
+                    </div>
                     <MusicPlayer/>
                 </PlayerProvider>
             </AuthProvider>

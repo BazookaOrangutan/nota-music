@@ -24,6 +24,9 @@ const SignUpPage = () => {
         e.preventDefault();
 
         try {
+            formData.username = formData.username.trim();
+            formData.password = formData.password.trim();
+            formData.email = formData.email.trim();
             const response = await apiClient.post('/auth/sign-up', formData);
             const payload = parseJwt(response.data.token);
             localStorage.setItem('token', response.data.token);
