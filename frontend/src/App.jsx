@@ -4,7 +4,7 @@ import ArtistsPage from './components/ArtistsPage';
 import ArtistDetailsPage from './components/ArtistDetailsPage';
 import AlbumCreatePage from './components/AlbumCreatePage';
 import AlbumDetailsPage from './components/AlbumDetailsPage';
-import MusicPlayer from "./components/MusicPlayer.jsx";
+import MusicPlayer from "./components/MusicPlayer/MusicPlayer.jsx";
 import {PlayerProvider} from "./context/PlayerContext.jsx";
 import SignInPage from "./components/SignInPage.jsx";
 import SignUpPage from "./components/SignUpPage.jsx";

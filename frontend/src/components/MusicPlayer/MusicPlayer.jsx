@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePlayer } from '../context/PlayerContext';
+import { usePlayer } from '../../context/PlayerContext.jsx';
 import './MusicPlayer.css';
 
 const MusicPlayer = () => {
