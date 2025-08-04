@@ -20,7 +20,7 @@ function App() {
             <AuthProvider>
                 <PlayerProvider>
                     <Header />
-                    <div style={{paddingBottom: '150px', paddingTop: '50px'}}>
+                    <div style={{paddingBottom: '165px', paddingTop: '50px'}}>
                         <Routes>
                             <Route path="/sign-up" element={<SignUpPage/>}/>
                             <Route path="/sign-in" element={<SignInPage/>}/>

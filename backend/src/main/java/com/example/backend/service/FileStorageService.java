@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Track;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -72,6 +73,17 @@ public class FileStorageService {
             Throwable cause = e.getCause();
             throw new RuntimeException("Не удалось удалить файлы альбома", cause != null ? cause : e);
         }
+    }
+
+    public void deleteTrack(Track track) throws IOException {
+
+        Path trackPath = Paths.get(track.getFilePath());
+
+        if (!Files.exists(trackPath)) {
+            return;
+        }
+
+        Files.delete(trackPath);
     }
 
     public ResponseEntity<?> serveTrack(HttpServletRequest request) {

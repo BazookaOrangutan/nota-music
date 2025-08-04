@@ -7,6 +7,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import {IconButton} from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 
 const AlbumDetailsPage = () => {
     const {albumId} = useParams();
@@ -24,8 +25,9 @@ const AlbumDetailsPage = () => {
 
                 const albumRes = await apiClient.get(`/albums/${albumId}`);
                 const albumData = albumRes.data;
-                setAlbum(albumData);
+                setAlbum({ ...albumData, tracks: [...(albumData.tracks || [])].sort(sortTracksByFilePath) });
 
+                console.log(albumData);
 
                 if (albumData.artistIds && albumData.artistIds.length > 0) {
                     const artistPromises = albumData.artistIds.map(id =>
@@ -75,15 +77,28 @@ const AlbumDetailsPage = () => {
         }
     };
 
+    const sortTracksByFilePath = (a, b) => {
+        const extractTrackNumber = (filePath) => {
+            const fileName = filePath.split(/[\\/]/).pop();
+            const match = fileName.match(/^(\d+)/);
+            return match ? parseInt(match[1], 10) : Infinity;
+        };
+
+        return extractTrackNumber(a.filePath) - extractTrackNumber(b.filePath);
+    };
+
+
+
     if (!album) return <div>Загрузка альбома...</div>;
     if (error) return <p style={{ color: 'red' }}>{error}</p>;
     if (!album) return <div>Альбом не найден</div>;
 
     return (
         <div style={{padding: '2rem'}}>
-            <button onClick={() => navigate(-1)} style={{marginBottom: '1rem'}}>
-                ←
-            </button>
+            <IconButton sx={{ color: 'var(--icon-color)' }}
+                        onClick={() => navigate(-1)} style={{marginBottom: '1rem'}}>
+                <ArrowBackIosNewOutlinedIcon/>
+            </IconButton>
 
             <h2>{album.title}</h2>
 

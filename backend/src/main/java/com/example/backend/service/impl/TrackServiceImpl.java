@@ -46,8 +46,7 @@ public class TrackServiceImpl implements TrackService {
             tracks.add(track);
         }
 
-//        return trackRepository.saveAll(tracks);
-        return tracks;
+        return trackRepository.saveAll(tracks);
     }
 
     @Override
@@ -58,19 +57,25 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    public Track updateTrack(UUID id, Track track) {
+    public Track updateTrack(Track track, Album album) {
 
-        if (!trackRepository.existsById(id)) {
-            throw new TrackNotFoundException(id);
-        }
-
-        track.setId(id);
+        track.setAlbum(album);
 
         return trackRepository.save(track);
     }
 
     @Override
     public void deleteTrackById(UUID id) {
+
+        Track track = trackRepository.findById(id).orElseThrow(
+                () -> new TrackNotFoundException(id));
+
+        try {
+            fileStorageService.deleteTrack(track);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         trackRepository.deleteById(id);
     }
 

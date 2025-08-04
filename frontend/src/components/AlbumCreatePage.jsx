@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from "../api/apiClient.js";
 import Select from 'react-select';
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
+import {IconButton} from "@mui/material";
 
 const AlbumCreatePage = () => {
     const navigate = useNavigate();
@@ -119,9 +121,10 @@ const AlbumCreatePage = () => {
 
     return (
         <div style={{ padding: '2rem' }}>
-            <button onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
-                ←
-            </button>
+            <IconButton sx={{ color: 'var(--icon-color)' }}
+                        onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
+                <ArrowBackIosNewOutlinedIcon/>
+            </IconButton>
             <h2>Создать альбом</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>

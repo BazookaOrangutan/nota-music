@@ -20,7 +20,7 @@ public class Album {
 
     private LocalDate releaseDate;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "album", cascade = {CascadeType.REMOVE})
     private List<Track> tracks;
 
     @ManyToMany

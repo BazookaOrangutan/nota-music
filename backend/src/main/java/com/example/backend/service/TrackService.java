@@ -44,11 +44,11 @@ public interface TrackService {
     /**
      * Обновление трека
      *
-     * @param id уникальный идентификатор трека
      * @param track трек
+     * @param album альбом
      * @return обновленный трек
      */
-    Track updateTrack(UUID id, Track track);
+    Track updateTrack(Track track, Album album);
 
     /**
      * Удаление трека

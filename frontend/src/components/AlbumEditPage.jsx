@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../api/apiClient.js';
 import Select from 'react-select';
+import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
+import {IconButton} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const AlbumEditPage = () => {
     const { albumId } = useParams();
@@ -12,6 +16,8 @@ const AlbumEditPage = () => {
     const [allArtists, setAllArtists] = useState([]);
     const [selectedArtists, setSelectedArtists] = useState([]);
     const [error, setError] = useState('');
+    const [deletedTrackIds, setDeletedTrackIds] = useState(new Set());
+
 
     useEffect(() => {
         const fetchAlbum = async () => {
@@ -19,7 +25,7 @@ const AlbumEditPage = () => {
                 const { data } = await apiClient.get(`/albums/${albumId}`);
                 setTitle(data.title);
                 setReleaseDate(data.releaseDate);
-                setTracks(data.tracks || []);
+                setTracks((data.tracks || []).sort(sortTracksByFilePath));
 
                 const artistOptions = (await apiClient.get('/artists')).data;
                 setAllArtists(artistOptions);
@@ -44,17 +50,20 @@ const AlbumEditPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-
-
         const payload = {
             title,
             releaseDate,
-            tracks,
-            artistIds: selectedArtists.map(a => a.value)
+            tracks: tracks.filter(track => !deletedTrackIds.has(track.id)),
+            artistIds: selectedArtists.map(a => a.value),
         };
 
         try {
+            for (const trackId of deletedTrackIds) {
+                await apiClient.delete(`/tracks/${trackId}`);
+            }
+
             await apiClient.put(`/albums/${albumId}`, payload);
+
             alert('Альбом обновлён!');
             navigate(-1);
         } catch (err) {
@@ -62,9 +71,36 @@ const AlbumEditPage = () => {
         }
     };
 
+    const sortTracksByFilePath = (a, b) => {
+        const extractTrackNumber = (filePath) => {
+            const fileName = filePath.split(/[\\/]/).pop();
+            const match = fileName.match(/^(\d+)/);
+            return match ? parseInt(match[1], 10) : Infinity;
+        };
+
+        return extractTrackNumber(a.filePath) - extractTrackNumber(b.filePath);
+    };
+
+
+    const toggleTrackDeletion = (trackId) => {
+        setDeletedTrackIds(prev => {
+            const updated = new Set(prev);
+            if (updated.has(trackId)) {
+                updated.delete(trackId);
+            } else {
+                updated.add(trackId);
+            }
+            return updated;
+        });
+    };
+
+
     return (
         <div style={{ padding: '2rem' }}>
-            <button onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>←</button>
+            <IconButton sx={{ color: 'var(--icon-color)' }}
+                        onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
+                <ArrowBackIosNewOutlinedIcon/>
+            </IconButton>
             <h2>Редактировать альбом</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
@@ -91,24 +127,38 @@ const AlbumEditPage = () => {
                     options={allArtists.map(a => ({ value: a.id, label: a.name }))}
                     value={selectedArtists}
                     onChange={setSelectedArtists}
-                    styles={{ container: base => ({ ...base, marginBottom: '1rem' }) }}
+                    styles={{option: (base) => ({
+                            ...base,
+                            backgroundColor: '#f9f9f9',
+                            color: '#333',
+                        })}}
                 />
 
                 <label>Треки:</label>
                 <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-                    {tracks.map((track, index) => (
-                        <li key={index}>
-                            <input
-                                type="text"
-                                value={track.title}
-                                onChange={(e) => handleTrackChange(index, e.target.value)}
-                                style={{ width: '100%', marginBottom: '0.5rem' }}
-                            />
-                        </li>
-                    ))}
+                    {tracks.map((track, index) => {
+                        const isMarkedForDeletion = deletedTrackIds.has(track.id);
+                        return (
+                            <li key={track.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    value={track.title}
+                                    onChange={(e) => handleTrackChange(index, e.target.value)}
+                                    style={{ flexGrow: 1 }}
+                                />
+                                <IconButton
+                                    onClick={() => toggleTrackDeletion(track.id)}
+                                    style={{ color: isMarkedForDeletion ? 'red' : 'gray' }}
+                                    aria-label="Удалить трек"
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </li>
+                        );
+                    })}
                 </ul>
 
-                <button type="submit">Сохранить изменения</button>
+                <button disabled={selectedArtists.length === 0} type="submit">Сохранить изменения</button>
             </form>
         </div>
     );

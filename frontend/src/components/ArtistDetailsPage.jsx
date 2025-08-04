@@ -5,6 +5,7 @@ import {AuthContext} from "../context/AuthContext.jsx";
 import {IconButton} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 
 
 const ArtistDetailsPage = () => {
@@ -59,9 +60,10 @@ const ArtistDetailsPage = () => {
 
     return (
         <div style={{padding: '2rem'}}>
-            <button onClick={() => navigate('/artists')} style={{marginBottom: '1rem'}}>
-                ←
-            </button>
+            <IconButton  sx={{color: 'var(--icon-color)'}}
+                         onClick={() => navigate('/artists')} style={{marginBottom: '1rem'}}>
+                <ArrowBackIosNewOutlinedIcon/>
+            </IconButton>
 
             <h2>{artist.name}</h2>
             {artist.image && <img src={artist.image} alt={artist.name} style={{maxWidth: '200px'}}/>}

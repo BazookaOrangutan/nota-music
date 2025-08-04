@@ -76,9 +76,9 @@ public class AlbumServiceImpl implements AlbumService {
 
         album.setId(id);
 
-//        album.getTracks().forEach(track -> trackService.);
-
         albumRequest.getArtistIds().forEach(artistId -> album.getArtists().add(artistService.getArtist(artistId)));
+
+        album.getTracks().forEach(track -> trackService.updateTrack(track, album));
 
         return albumMapper.toResponse(albumRepository.save(album));
     }

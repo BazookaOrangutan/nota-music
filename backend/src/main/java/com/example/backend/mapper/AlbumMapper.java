@@ -20,6 +20,8 @@ public interface AlbumMapper {
 
     Album fromRequest(AlbumRequest albumRequest);
 
+//    Album fromUpdateRequest(AlbumUpdateRequest albumUpdateRequest);
+
     @Named("mapArtistIds")
     default List<UUID> mapArtistIds(List<Artist> artists) {
         return artists != null

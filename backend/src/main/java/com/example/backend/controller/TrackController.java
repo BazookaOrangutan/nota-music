@@ -19,7 +19,7 @@ public class TrackController {
     private final TrackService trackService;
 
     @GetMapping("/album/{albumId}")
-    public List<TrackResponse> getAllTracks(@PathVariable UUID albumId) {
+    public List<TrackResponse> getAllTracksByAlbumId(@PathVariable UUID albumId) {
         return trackService.getAllTracksByAlbumId(albumId);
     }
 
@@ -34,10 +34,10 @@ public class TrackController {
     }
 
 
-    @PutMapping("/{id}")
-    public Track updateTrack(@PathVariable UUID id, @RequestBody Track updatedTrack) {
-        return trackService.updateTrack(id, updatedTrack);
-    }
+//    @PutMapping("/{id}")
+//    public Track updateTrack(@PathVariable UUID id, @RequestBody Track updatedTrack) {
+//        return trackService.updateTrack(updatedTrack);
+//    }
 
     @DeleteMapping("/{id}")
     public void deleteTrack(@PathVariable UUID id) {

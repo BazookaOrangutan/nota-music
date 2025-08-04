@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import apiClient from "../api/apiClient";
 import { PlayerContext } from "../context/PlayerContext";
 import {useNavigate} from "react-router-dom";
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
+import {IconButton} from "@mui/material";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const ProfilePage = () => {
     const [favoriteTracks, setFavoriteTracks] = useState([]);
@@ -47,9 +50,10 @@ const ProfilePage = () => {
 
     return (
         <div style={{ padding: '2rem' }}>
-            <button onClick={() => navigate(-1)} style={{marginBottom: '1rem'}}>
-                ←
-            </button>
+            <IconButton sx={{ color: 'var(--icon-color)' }}
+                        onClick={() => navigate(-1)} style={{marginBottom: '1rem'}}>
+                <ArrowBackIosNewOutlinedIcon/>
+            </IconButton>
             <h2>Избранные треки</h2>
 
             {favoriteTracks.length === 0 ? (
@@ -58,12 +62,12 @@ const ProfilePage = () => {
                 <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
                     {favoriteTracks.map((track, index) => (
                         <li key={track.id} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
-                            <button
+                            <IconButton sx={{ color: 'var(--icon-color)' }}
                                 onClick={() => play(buildAlbumFromTracks(favoriteTracks), index)}
                                 style={{ marginRight: '0.5rem' }}
                             >
-                                ▶
-                            </button>
+                                <PlayArrowIcon/>
+                            </IconButton>
                             {index + 1}. {track.title}
                             <button
                                 onClick={() => removeFromFavorites(track.id)}
