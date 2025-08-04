@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
@@ -72,6 +73,29 @@ public class FileStorageService {
         } catch (RuntimeException e) {
             Throwable cause = e.getCause();
             throw new RuntimeException("Не удалось удалить файлы альбома", cause != null ? cause : e);
+        }
+    }
+
+    public String updateTrackFile(Track track, MultipartFile file) throws IOException {
+
+        String oldPath = track.getFilePath();
+
+        String newFileName = file.getOriginalFilename();
+        Path path = Paths.get(oldPath);
+        String directoryPath = path.getParent().toString();
+
+        try {
+            Path newPath = Paths.get(directoryPath, newFileName);
+            Files.copy(file.getInputStream(), newPath, StandardCopyOption.REPLACE_EXISTING);
+
+            if (!newPath.getFileName().toString().equals(path.getFileName().toString())) {
+                Files.deleteIfExists(path);
+            }
+
+            return newPath.toString();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось заменить файл трека", e);
         }
     }
 

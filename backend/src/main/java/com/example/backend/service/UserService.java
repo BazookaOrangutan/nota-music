@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.response.UserResponse;
+import com.example.backend.exception.UserAlreadyExistsException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.model.Track;
 import com.example.backend.model.User;
@@ -41,12 +42,11 @@ public class UserService {
      */
     public User create(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            // Заменить на свои исключения
-            throw new RuntimeException("Пользователь с таким именем уже существует");
+            throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Пользователь с таким email уже существует");
+            throw new UserAlreadyExistsException("Пользователь с таким email уже существует");
         }
 
         return save(user);

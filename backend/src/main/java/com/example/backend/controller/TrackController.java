@@ -5,6 +5,7 @@ import com.example.backend.model.Track;
 import com.example.backend.service.TrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,10 +35,10 @@ public class TrackController {
     }
 
 
-//    @PutMapping("/{id}")
-//    public Track updateTrack(@PathVariable UUID id, @RequestBody Track updatedTrack) {
-//        return trackService.updateTrack(updatedTrack);
-//    }
+    @PutMapping("/{id}/file")
+    public void updateTrackFile(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+        trackService.updateTrackFile(id, file);
+    }
 
     @DeleteMapping("/{id}")
     public void deleteTrack(@PathVariable UUID id) {

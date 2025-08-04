@@ -17,6 +17,8 @@ const AlbumEditPage = () => {
     const [selectedArtists, setSelectedArtists] = useState([]);
     const [error, setError] = useState('');
     const [deletedTrackIds, setDeletedTrackIds] = useState(new Set());
+    const [updatedTrackFiles, setUpdatedTrackFiles] = useState({});
+
 
 
     useEffect(() => {
@@ -47,6 +49,11 @@ const AlbumEditPage = () => {
         setTracks(updated);
     };
 
+    const handleFileChange = (trackId, file) => {
+        setUpdatedTrackFiles(prev => ({ ...prev, [trackId]: file }));
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -63,6 +70,14 @@ const AlbumEditPage = () => {
             }
 
             await apiClient.put(`/albums/${albumId}`, payload);
+
+            for (const [trackId, file] of Object.entries(updatedTrackFiles)) {
+                const formData = new FormData();
+                formData.append('file', file);
+                await apiClient.put(`/tracks/${trackId}/file`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+            }
 
             alert('Альбом обновлён!');
             navigate(-1);
@@ -149,6 +164,12 @@ const AlbumEditPage = () => {
                                     value={track.title}
                                     onChange={(e) => handleTrackChange(index, e.target.value)}
                                     style={{ flexGrow: 1 }}
+                                />
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    style={{ marginLeft: '1rem' }}
+                                    onChange={(e) => handleFileChange(track.id, e.target.files[0])}
                                 />
                                 <IconButton
                                     onClick={() => toggleTrackDeletion(track.id)}

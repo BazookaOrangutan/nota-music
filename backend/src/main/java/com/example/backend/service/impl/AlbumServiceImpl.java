@@ -7,7 +7,9 @@ import com.example.backend.mapper.AlbumMapper;
 import com.example.backend.model.Album;
 import com.example.backend.model.Artist;
 import com.example.backend.model.Track;
+import com.example.backend.model.User;
 import com.example.backend.repository.AlbumRepository;
+import com.example.backend.repository.UserRepository;
 import com.example.backend.service.AlbumService;
 import com.example.backend.service.ArtistService;
 import com.example.backend.service.FileStorageService;
@@ -32,6 +34,8 @@ public class AlbumServiceImpl implements AlbumService {
     private final TrackService trackService;
 
     private final FileStorageService fileStorageService;
+
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -85,6 +89,23 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public void deleteAlbum(UUID id) {
+
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new AlbumNotFoundException(id));
+
+        for (Track track : album.getTracks()) {
+            for (User user : track.getUsersWhoLikesTrack()) {
+                user.getFavouritesTracks().remove(track);
+            }
+            track.getUsersWhoLikesTrack().clear();
+        }
+
+        userRepository.saveAll(
+                album.getTracks().stream()
+                        .flatMap(t -> t.getUsersWhoLikesTrack().stream())
+                        .distinct()
+                        .toList()
+        );
 
         try {
             fileStorageService.deleteAlbum(id);

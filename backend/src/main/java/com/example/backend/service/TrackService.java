@@ -51,6 +51,14 @@ public interface TrackService {
     Track updateTrack(Track track, Album album);
 
     /**
+     * Обновление файла трека
+     *
+     * @param trackId уникальный идентификатор трека
+     * @param file новый файл трека
+     */
+    void updateTrackFile(UUID trackId, MultipartFile file);
+
+    /**
      * Удаление трека
      *
      * @param id уникальный идентификатор трека
