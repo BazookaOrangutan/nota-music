@@ -1,6 +1,11 @@
 import React from 'react';
 import { usePlayer } from '../../context/PlayerContext.jsx';
 import './MusicPlayer.css';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import {IconButton} from "@mui/material";
 
 const MusicPlayer = () => {
     const {
@@ -28,15 +33,15 @@ const MusicPlayer = () => {
             </div>
 
             <div className="player-controls">
-                <button onClick={prevTrack} className="control-btn" aria-label="Previous track">
-                    ⏮️
-                </button>
-                <button onClick={togglePlayPause} className="control-btn big-btn" aria-label="Play/Pause">
-                    {isPlaying ? '⏸️' : '▶️'}
-                </button>
-                <button onClick={nextTrack} className="control-btn" aria-label="Next track">
-                    ⏭️
-                </button>
+                <IconButton sx={{color: 'white'}} onClick={prevTrack} className="control-btn" aria-label="Previous track">
+                    <SkipPreviousIcon/>
+                </IconButton>
+                <IconButton sx={{color: 'white'}} onClick={togglePlayPause} className="control-btn big-btn" aria-label="Play/Pause">
+                    {isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
+                </IconButton>
+                <IconButton sx={{color: 'white'}} onClick={nextTrack} className="control-btn" aria-label="Next track">
+                    <SkipNextIcon/>
+                </IconButton>
             </div>
 
             <div className="player-progress">

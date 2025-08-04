@@ -36,10 +36,10 @@ const ArtistCreateModal = ({ onClose, onArtistCreated }) => {
             zIndex: 1000,
             borderRadius: '5%'
         }}>
-            <h3>Создать исполнителя</h3>
+            <h3 style={{color: 'white'}}>Создать исполнителя</h3>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
-                <label>
+                <label style={{color:"white"}}>
                     Имя:
                     <input
                         type="text"

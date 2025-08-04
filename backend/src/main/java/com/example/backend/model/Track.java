@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -25,16 +23,13 @@ public class Track {
     @JoinColumn(name = "album_id")
     private Album album;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @JoinTable(name = "feat_track_artist",
             joinColumns = @JoinColumn(name = "track_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"))
     private Set<Artist> featArtists = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "user_favourite_track",
-            joinColumns = @JoinColumn(name = "track_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    private Set<User> usersWhoLikesTrack = new HashSet<>();
+    @ManyToMany(mappedBy = "favouritesTracks")
+    private List<User> usersWhoLikesTrack = new ArrayList<>();
 
 }

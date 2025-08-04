@@ -2,6 +2,10 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import apiClient from "../api/apiClient.js";
 import {AuthContext} from "../context/AuthContext.jsx";
+import {IconButton} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 const ArtistDetailsPage = () => {
     const {artistId} = useParams();
@@ -73,12 +77,21 @@ const ArtistDetailsPage = () => {
                             <Link to={`/albums/${album.id}`}>
                                 {album.title} ({album.releaseDate})
                             </Link>
-                            {hasRole('ROLE_ADMIN') && (<button
+                            <div>
+                                {hasRole('ROLE_ADMIN') && (<IconButton
                                 onClick={() => handleDeleteAlbum(album.id)}
                                 style={{marginLeft: '1rem', color: 'red', border: 'none', background: 'transparent'}}
                             >
-                                🗑️
-                            </button>)}
+                                <DeleteIcon/>
+                            </IconButton>)}
+                                {hasRole('ROLE_ADMIN') && (<Link to={`/albums/${album.id}/edit`}>
+                                    <IconButton sx={{color: 'var(--icon-color)'}}
+                                                style={{marginLeft: '0.5rem'}} aria-label="Редактировать альбом">
+                                        <EditIcon/>
+                                    </IconButton>
+                                </Link>)}
+                            </div>
+
                         </li>
                     ))}
                 </ul>

@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.ArtistRequest;
 import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.model.Artist;
@@ -19,7 +20,7 @@ public interface ArtistService {
 
     List<Artist> getArtistsByIds(List<UUID> ids);
 
-    Artist updateArtist(UUID id, Artist artist);
+    ArtistResponse updateArtist(UUID id, ArtistRequest artistRequest);
 
     void deleteArtist(UUID id);
 }

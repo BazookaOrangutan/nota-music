@@ -1,0 +1,54 @@
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    background-color: #1a1a1a;
+    color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-left h1 {
+    margin: 0 2rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.header-left h1:hover {
+    opacity: 0.9;
+}
+
+.header-right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin: 0 2rem;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.logout-button {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: white;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.logout-button:hover {
+    background-color: #333;
+}

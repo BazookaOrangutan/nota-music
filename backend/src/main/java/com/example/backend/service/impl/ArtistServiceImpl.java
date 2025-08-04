@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.dto.request.ArtistRequest;
 import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.exception.ArtistNotFoundException;
@@ -62,15 +63,17 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public Artist updateArtist(UUID id, Artist artist) {
+    public ArtistResponse updateArtist(UUID id, ArtistRequest artistRequest) {
 
         if (!artistRepository.existsById(id)) {
             throw new ArtistNotFoundException(id);
         }
 
+        Artist artist = artistMapper.toArtist(artistRequest);
+
         artist.setId(id);
 
-        return artistRepository.save(artist);
+        return artistMapper.toResponse(artistRepository.save(artist));
     }
 
     @Override

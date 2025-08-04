@@ -31,6 +31,7 @@ const SignUpPage = () => {
             const payload = parseJwt(response.data.token);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', payload.role);
+            localStorage.setItem('userId', payload.id);
             navigate('/artists');
         } catch (err) {
             setError(err.response?.data?.message || 'Ошибка регистрации');

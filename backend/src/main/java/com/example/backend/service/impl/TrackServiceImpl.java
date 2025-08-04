@@ -46,7 +46,8 @@ public class TrackServiceImpl implements TrackService {
             tracks.add(track);
         }
 
-        return trackRepository.saveAll(tracks);
+//        return trackRepository.saveAll(tracks);
+        return tracks;
     }
 
     @Override

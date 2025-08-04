@@ -9,7 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -36,11 +39,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "user_favourite_track",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "track_id", referencedColumnName = "id"))
-    private Set<Track> favouritesTracks = new HashSet<>();
+    private List<Track> favouritesTracks = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

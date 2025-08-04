@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.request.ArtistRequest;
 import com.example.backend.dto.response.AlbumResponse;
 import com.example.backend.dto.response.ArtistResponse;
 import com.example.backend.model.Artist;
@@ -43,7 +44,7 @@ public class ArtistController {
 
 
     @PutMapping("/{id}")
-    public Artist updateArtist(@PathVariable UUID id, @RequestBody Artist updatedArtist) {
+    public ArtistResponse updateArtist(@PathVariable UUID id, @RequestBody ArtistRequest updatedArtist) {
         return artistService.updateArtist(id, updatedArtist);
     }
 

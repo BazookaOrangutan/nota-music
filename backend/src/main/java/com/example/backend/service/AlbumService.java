@@ -17,7 +17,7 @@ public interface AlbumService {
 
     List<Album> getAllAlbums();
 
-    Album updateAlbum(UUID id, Album album);
+    AlbumResponse updateAlbum(UUID id, AlbumRequest album);
 
     void deleteAlbum(UUID id);
 

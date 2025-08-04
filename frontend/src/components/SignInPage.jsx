@@ -29,6 +29,7 @@ const SignInPage = () => {
             const payload = parseJwt(response.data.token);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', payload.role);
+            localStorage.setItem('userId', payload.id);
             console.log(payload.role);
             navigate('/artists');
         } catch (err) {

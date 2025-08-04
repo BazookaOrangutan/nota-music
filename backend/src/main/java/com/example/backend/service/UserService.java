@@ -1,18 +1,28 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.response.UserResponse;
+import com.example.backend.mapper.UserMapper;
+import com.example.backend.model.Track;
 import com.example.backend.model.User;
+import com.example.backend.repository.TrackRepository;
 import com.example.backend.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final UserMapper mapper;
+    private final TrackRepository trackRepository;
 
     /**
      * Сохранение пользователя
@@ -20,7 +30,7 @@ public class UserService {
      * @return сохраненный пользователь
      */
     public User save(User user) {
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
 
@@ -30,12 +40,12 @@ public class UserService {
      * @return созданный пользователь
      */
     public User create(User user) {
-        if (repository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsername(user.getUsername())) {
             // Заменить на свои исключения
             throw new RuntimeException("Пользователь с таким именем уже существует");
         }
 
-        if (repository.existsByEmail(user.getEmail())) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Пользователь с таким email уже существует");
         }
 
@@ -48,7 +58,7 @@ public class UserService {
      * @return пользователь
      */
     public User getByUsername(String username) {
-        return repository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
     }
@@ -73,5 +83,42 @@ public class UserService {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
         return getByUsername(username);
     }
+
+    /**
+     * Получение пользователя по id
+     *
+     * @param id уникальный идентификатор пользователя
+     * @return пользователь
+     */
+    public UserResponse getUserById(UUID id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        return mapper.toResponse(user);
+    }
+
+    @Transactional
+    public void addTrackToFavorites(UUID userId, UUID trackId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Track track = trackRepository.findById(trackId)
+                .orElseThrow(() -> new EntityNotFoundException("Track not found"));
+
+        user.getFavouritesTracks().add(track);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void removeTrackFromFavorites(UUID userId, UUID trackId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Track track = trackRepository.findById(trackId)
+                .orElseThrow(() -> new EntityNotFoundException("Track not found"));
+
+        user.getFavouritesTracks().remove(track);
+        userRepository.save(user);
+    }
+
 
 }

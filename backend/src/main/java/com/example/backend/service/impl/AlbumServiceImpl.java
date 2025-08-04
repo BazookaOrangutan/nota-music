@@ -66,15 +66,21 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public Album updateAlbum(UUID id, Album album) {
+    public AlbumResponse updateAlbum(UUID id, AlbumRequest albumRequest) {
 
         if (!albumRepository.existsById(id)) {
             throw new AlbumNotFoundException(id);
         }
 
+        Album album = albumMapper.fromRequest(albumRequest);
+
         album.setId(id);
 
-        return albumRepository.save(album);
+//        album.getTracks().forEach(track -> trackService.);
+
+        albumRequest.getArtistIds().forEach(artistId -> album.getArtists().add(artistService.getArtist(artistId)));
+
+        return albumMapper.toResponse(albumRepository.save(album));
     }
 
     @Override

@@ -3,6 +3,8 @@ import {Link} from 'react-router-dom';
 import apiClient from '../api/apiClient';
 import ArtistCreateModal from "./ArtistCreateModal.jsx";
 import {AuthContext} from "../context/AuthContext.jsx";
+import DeleteIcon from '@mui/icons-material/Delete';
+import {IconButton} from "@mui/material";
 
 const ArtistsPage = () => {
     const [artists, setArtists] = useState([]);
@@ -40,12 +42,6 @@ const ArtistsPage = () => {
 
     return (
         <div style={{padding: '2rem'}}>
-            <button onClick={() => {
-                localStorage.removeItem('token');
-                window.location.href = '/sign-in';
-            }}>
-                Выйти
-            </button>
 
             <h2>Исполнители</h2>
             {error && <p style={{color: 'red'}}>{error}</p>}
@@ -55,12 +51,12 @@ const ArtistsPage = () => {
                 {artists.map((artist) => (
                     <li key={artist.id} style={{marginBottom: '1rem'}}>
                         <Link to={`/artists/${artist.id}`}>{artist.name}</Link>
-                        {hasRole('ROLE_ADMIN') && (<button
+                        {hasRole('ROLE_ADMIN') && (<IconButton
                             onClick={() => handleDeleteArtist(artist.id)}
                             style={{color: 'red', border: 'none', background: 'transparent'}}
                         >
-                            🗑️
-                        </button>)}
+                            <DeleteIcon/>
+                        </IconButton>)}
                     </li>
                 ))}
             </ul>

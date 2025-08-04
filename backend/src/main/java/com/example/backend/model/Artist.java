@@ -18,7 +18,7 @@ public class Artist {
     @ManyToMany(mappedBy = "artists")
     private List<Album> albums = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @JoinTable(name = "feat_track_artist",
             joinColumns = @JoinColumn(name = "artist_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "track_id", referencedColumnName = "id"))
