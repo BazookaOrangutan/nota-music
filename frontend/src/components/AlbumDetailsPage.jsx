@@ -79,9 +79,14 @@ const AlbumDetailsPage = () => {
 
     const sortTracksByFilePath = (a, b) => {
         const extractTrackNumber = (filePath) => {
-            const fileName = filePath.split(/[\\/]/).pop();
-            const match = fileName.match(/^(\d+)/);
-            return match ? parseInt(match[1], 10) : Infinity;
+            const fileName = filePath.replace(/\\/g, '/').split('/').pop();
+            const match = fileName.match(/^(\d+)[-_]?(\d+)?/);
+            if (!match) return Infinity;
+
+            const part1 = parseInt(match[1], 10);
+            const part2 = match[2] ? parseInt(match[2], 10) : 0;
+
+            return part1 * 1000 + part2; // чтобы 1-02 < 2-01
         };
 
         return extractTrackNumber(a.filePath) - extractTrackNumber(b.filePath);
