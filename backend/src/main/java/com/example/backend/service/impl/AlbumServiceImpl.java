@@ -14,9 +14,9 @@ import com.example.backend.service.AlbumService;
 import com.example.backend.service.ArtistService;
 import com.example.backend.service.FileStorageService;
 import com.example.backend.service.TrackService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -88,6 +88,7 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
+    @Transactional
     public void deleteAlbum(UUID id) {
 
         Album album = albumRepository.findById(id)

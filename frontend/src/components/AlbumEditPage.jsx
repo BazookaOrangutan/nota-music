@@ -72,6 +72,8 @@ const AlbumEditPage = () => {
             await apiClient.put(`/albums/${albumId}`, payload);
 
             for (const [trackId, file] of Object.entries(updatedTrackFiles)) {
+                if (deletedTrackIds.has(trackId)) continue;
+
                 const formData = new FormData();
                 formData.append('file', file);
                 await apiClient.put(`/tracks/${trackId}/file`, formData, {
@@ -166,6 +168,7 @@ const AlbumEditPage = () => {
                                     style={{ flexGrow: 1 }}
                                 />
                                 <input
+                                    disabled={deletedTrackIds.has(track.id)}
                                     type="file"
                                     accept="audio/*"
                                     style={{ marginLeft: '1rem' }}
